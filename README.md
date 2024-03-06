@@ -1,3 +1,30 @@
+# Impression
+
+## Pros
+
+- default export なし
+- docs 充実
+- ボイラーな部分（以下）は、dev server 起動中は自動生成・自動修正してくれるので、かなり開発体験が良さそう
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router"
+
+export const Route = createFileRoute("/posts/$postId/")({
+  component: Post,
+})
+```
+
+- 以下の Component 名の部分は、Copilot が補完してくれるので、命名の統一はしやすそうかも
+  - 反面、ただの `Component` でもよさそう。
+  - React DevTools で Component 名が見えるわけでもなさそうなので、命名考えるモチベがなさそう。
+
+> component: PostsPostIdCommentId,
+> function PostsPostIdCommentId() {
+
+## Cons
+
+- ボイラーテンプレートなコードを全ページに実装することになる
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
