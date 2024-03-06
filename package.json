@@ -1,5 +1,5 @@
 {
-  "name": "try-vite",
+  "name": "try-tanstack-router",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,6 +13,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-router": "1.19.1",
+    "@tanstack/router-devtools": "1.19.1",
+    "@tanstack/router-vite-plugin": "1.19.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
