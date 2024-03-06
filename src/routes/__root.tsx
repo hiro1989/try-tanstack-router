@@ -15,13 +15,15 @@ const TanStackRouterDevtools = import.meta.env.PROD
 export const Route = createRootRoute({
   component: () => (
     <>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+        }}
+      >
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/posts">Posts</Link>
       </div>
       <hr />
       <Outlet />
