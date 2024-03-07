@@ -1,10 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/posts/$postId/")({
-  component: PostsPostId,
-})
-
-function PostsPostId() {
+const PostsPostId = () => {
   const { postId } = Route.useParams()
   return (
     <div>
@@ -23,3 +19,7 @@ function PostsPostId() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/posts/$postId/")({
+  component: PostsPostId,
+})

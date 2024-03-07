@@ -1,10 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/posts/")({
-  component: Posts,
-})
-
-function Posts() {
+const Posts = () => {
   return (
     <div>
       <h3>Hello /posts/!</h3>
@@ -43,3 +39,7 @@ function Posts() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/posts/")({
+  component: Posts,
+})
