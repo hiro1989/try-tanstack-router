@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { Link, createLazyFileRoute } from "@tanstack/react-router"
 
 const Posts = () => {
   return (
@@ -40,6 +40,6 @@ const Posts = () => {
   )
 }
 
-export const Route = createFileRoute("/posts/")({
+export const Route = createLazyFileRoute("/posts/")({
   component: Posts,
 })

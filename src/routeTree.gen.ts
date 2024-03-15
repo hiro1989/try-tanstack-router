@@ -13,20 +13,23 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as PostsIndexImport } from './routes/posts/index'
 import { Route as PostsAuthenticatedImport } from './routes/posts/_authenticated'
 import { Route as PostsAuthenticatedPostIdLayoutImport } from './routes/posts/_authenticated/$postId/_layout'
-import { Route as PostsAuthenticatedPostIdLayoutIndexImport } from './routes/posts/_authenticated/$postId/_layout/index'
-import { Route as PostsAuthenticatedPostIdLayoutCommentsCommentIdImport } from './routes/posts/_authenticated/$postId/_layout/comments.$commentId'
 
 // Create Virtual Routes
 
 const PostsImport = createFileRoute('/posts')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
+const PostsIndexLazyImport = createFileRoute('/posts/')()
 const PostsAuthenticatedPostIdImport = createFileRoute(
   '/posts/_authenticated/$postId',
 )()
+const PostsAuthenticatedPostIdLayoutIndexLazyImport = createFileRoute(
+  '/posts/_authenticated/$postId/_layout/',
+)()
+const PostsAuthenticatedPostIdLayoutCommentsCommentIdLazyImport =
+  createFileRoute('/posts/_authenticated/$postId/_layout/comments/$commentId')()
 
 // Create/Update Routes
 
@@ -45,10 +48,10 @@ const IndexLazyRoute = IndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
-const PostsIndexRoute = PostsIndexImport.update({
+const PostsIndexLazyRoute = PostsIndexLazyImport.update({
   path: '/',
   getParentRoute: () => PostsRoute,
-} as any)
+} as any).lazy(() => import('./routes/posts/index.lazy').then((d) => d.Route))
 
 const PostsAuthenticatedRoute = PostsAuthenticatedImport.update({
   id: '/_authenticated',
@@ -66,17 +69,25 @@ const PostsAuthenticatedPostIdLayoutRoute =
     getParentRoute: () => PostsAuthenticatedPostIdRoute,
   } as any)
 
-const PostsAuthenticatedPostIdLayoutIndexRoute =
-  PostsAuthenticatedPostIdLayoutIndexImport.update({
+const PostsAuthenticatedPostIdLayoutIndexLazyRoute =
+  PostsAuthenticatedPostIdLayoutIndexLazyImport.update({
     path: '/',
     getParentRoute: () => PostsAuthenticatedPostIdLayoutRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/posts/_authenticated/$postId/_layout/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
-const PostsAuthenticatedPostIdLayoutCommentsCommentIdRoute =
-  PostsAuthenticatedPostIdLayoutCommentsCommentIdImport.update({
+const PostsAuthenticatedPostIdLayoutCommentsCommentIdLazyRoute =
+  PostsAuthenticatedPostIdLayoutCommentsCommentIdLazyImport.update({
     path: '/comments/$commentId',
     getParentRoute: () => PostsAuthenticatedPostIdLayoutRoute,
-  } as any)
+  } as any).lazy(() =>
+    import(
+      './routes/posts/_authenticated/$postId/_layout/comments.$commentId.lazy'
+    ).then((d) => d.Route),
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -99,7 +110,7 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof PostsRoute
     }
     '/posts/': {
-      preLoaderRoute: typeof PostsIndexImport
+      preLoaderRoute: typeof PostsIndexLazyImport
       parentRoute: typeof PostsImport
     }
     '/posts/_authenticated/$postId': {
@@ -111,11 +122,11 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof PostsAuthenticatedPostIdRoute
     }
     '/posts/_authenticated/$postId/_layout/': {
-      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutIndexImport
+      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutIndexLazyImport
       parentRoute: typeof PostsAuthenticatedPostIdLayoutImport
     }
     '/posts/_authenticated/$postId/_layout/comments/$commentId': {
-      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutCommentsCommentIdImport
+      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutCommentsCommentIdLazyImport
       parentRoute: typeof PostsAuthenticatedPostIdLayoutImport
     }
   }
@@ -130,12 +141,12 @@ export const routeTree = rootRoute.addChildren([
     PostsAuthenticatedRoute.addChildren([
       PostsAuthenticatedPostIdRoute.addChildren([
         PostsAuthenticatedPostIdLayoutRoute.addChildren([
-          PostsAuthenticatedPostIdLayoutIndexRoute,
-          PostsAuthenticatedPostIdLayoutCommentsCommentIdRoute,
+          PostsAuthenticatedPostIdLayoutIndexLazyRoute,
+          PostsAuthenticatedPostIdLayoutCommentsCommentIdLazyRoute,
         ]),
       ]),
     ]),
-    PostsIndexRoute,
+    PostsIndexLazyRoute,
   ]),
 ])
 

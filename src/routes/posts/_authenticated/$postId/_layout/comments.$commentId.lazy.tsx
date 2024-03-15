@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createLazyFileRoute } from "@tanstack/react-router"
 
 const PostsPostIdCommentId = () => {
   const { postId, commentId } = Route.useParams()
@@ -9,6 +9,8 @@ const PostsPostIdCommentId = () => {
   )
 }
 
-export const Route = createFileRoute("/posts/_authenticated/$postId/_layout/comments/$commentId")({
+export const Route = createLazyFileRoute(
+  "/posts/_authenticated/$postId/_layout/comments/$commentId",
+)({
   component: PostsPostIdCommentId,
 })
