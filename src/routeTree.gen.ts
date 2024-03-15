@@ -14,15 +14,22 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as PostsIndexImport } from './routes/posts/index'
-import { Route as PostsPostIdIndexImport } from './routes/posts/$postId/index'
-import { Route as PostsPostIdCommentsCommentIdImport } from './routes/posts/$postId/comments.$commentId'
+import { Route as PostsAuthenticatedImport } from './routes/posts/_authenticated'
+import { Route as PostsAuthenticatedPostIdIndexImport } from './routes/posts/_authenticated/$postId/index'
+import { Route as PostsAuthenticatedPostIdCommentsCommentIdImport } from './routes/posts/_authenticated/$postId/comments.$commentId'
 
 // Create Virtual Routes
 
+const PostsImport = createFileRoute('/posts')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const PostsRoute = PostsImport.update({
+  path: '/posts',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
@@ -35,19 +42,25 @@ const IndexLazyRoute = IndexLazyImport.update({
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
 const PostsIndexRoute = PostsIndexImport.update({
-  path: '/posts/',
-  getParentRoute: () => rootRoute,
+  path: '/',
+  getParentRoute: () => PostsRoute,
 } as any)
 
-const PostsPostIdIndexRoute = PostsPostIdIndexImport.update({
-  path: '/posts/$postId/',
-  getParentRoute: () => rootRoute,
+const PostsAuthenticatedRoute = PostsAuthenticatedImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => PostsRoute,
 } as any)
 
-const PostsPostIdCommentsCommentIdRoute =
-  PostsPostIdCommentsCommentIdImport.update({
-    path: '/posts/$postId/comments/$commentId',
-    getParentRoute: () => rootRoute,
+const PostsAuthenticatedPostIdIndexRoute =
+  PostsAuthenticatedPostIdIndexImport.update({
+    path: '/$postId/',
+    getParentRoute: () => PostsAuthenticatedRoute,
+  } as any)
+
+const PostsAuthenticatedPostIdCommentsCommentIdRoute =
+  PostsAuthenticatedPostIdCommentsCommentIdImport.update({
+    path: '/$postId/comments/$commentId',
+    getParentRoute: () => PostsAuthenticatedRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -62,17 +75,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/posts': {
+      preLoaderRoute: typeof PostsImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts/_authenticated': {
+      preLoaderRoute: typeof PostsAuthenticatedImport
+      parentRoute: typeof PostsRoute
+    }
     '/posts/': {
       preLoaderRoute: typeof PostsIndexImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof PostsImport
     }
-    '/posts/$postId/': {
-      preLoaderRoute: typeof PostsPostIdIndexImport
-      parentRoute: typeof rootRoute
+    '/posts/_authenticated/$postId/': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdIndexImport
+      parentRoute: typeof PostsAuthenticatedImport
     }
-    '/posts/$postId/comments/$commentId': {
-      preLoaderRoute: typeof PostsPostIdCommentsCommentIdImport
-      parentRoute: typeof rootRoute
+    '/posts/_authenticated/$postId/comments/$commentId': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdCommentsCommentIdImport
+      parentRoute: typeof PostsAuthenticatedImport
     }
   }
 }
@@ -82,9 +103,13 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexLazyRoute,
   AboutLazyRoute,
-  PostsIndexRoute,
-  PostsPostIdIndexRoute,
-  PostsPostIdCommentsCommentIdRoute,
+  PostsRoute.addChildren([
+    PostsAuthenticatedRoute.addChildren([
+      PostsAuthenticatedPostIdIndexRoute,
+      PostsAuthenticatedPostIdCommentsCommentIdRoute,
+    ]),
+    PostsIndexRoute,
+  ]),
 ])
 
 /* prettier-ignore-end */

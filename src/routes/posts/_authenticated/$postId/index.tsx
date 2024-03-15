@@ -20,6 +20,6 @@ const PostsPostId = () => {
   )
 }
 
-export const Route = createFileRoute("/posts/$postId/")({
+export const Route = createFileRoute("/posts/_authenticated/$postId/")({
   component: PostsPostId,
 })
