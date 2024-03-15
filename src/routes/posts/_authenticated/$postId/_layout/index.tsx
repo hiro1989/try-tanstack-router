@@ -2,6 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 
 const PostsPostId = () => {
   const { postId } = Route.useParams()
+  console.log({ postId })
   return (
     <div>
       <div>Hello /posts/{postId}!</div>
@@ -20,6 +21,6 @@ const PostsPostId = () => {
   )
 }
 
-export const Route = createFileRoute("/posts/_authenticated/$postId/")({
+export const Route = createFileRoute("/posts/_authenticated/$postId/_layout/")({
   component: PostsPostId,
 })

@@ -15,14 +15,18 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as PostsIndexImport } from './routes/posts/index'
 import { Route as PostsAuthenticatedImport } from './routes/posts/_authenticated'
-import { Route as PostsAuthenticatedPostIdIndexImport } from './routes/posts/_authenticated/$postId/index'
-import { Route as PostsAuthenticatedPostIdCommentsCommentIdImport } from './routes/posts/_authenticated/$postId/comments.$commentId'
+import { Route as PostsAuthenticatedPostIdLayoutImport } from './routes/posts/_authenticated/$postId/_layout'
+import { Route as PostsAuthenticatedPostIdLayoutIndexImport } from './routes/posts/_authenticated/$postId/_layout/index'
+import { Route as PostsAuthenticatedPostIdLayoutCommentsCommentIdImport } from './routes/posts/_authenticated/$postId/_layout/comments.$commentId'
 
 // Create Virtual Routes
 
 const PostsImport = createFileRoute('/posts')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
+const PostsAuthenticatedPostIdImport = createFileRoute(
+  '/posts/_authenticated/$postId',
+)()
 
 // Create/Update Routes
 
@@ -51,16 +55,27 @@ const PostsAuthenticatedRoute = PostsAuthenticatedImport.update({
   getParentRoute: () => PostsRoute,
 } as any)
 
-const PostsAuthenticatedPostIdIndexRoute =
-  PostsAuthenticatedPostIdIndexImport.update({
-    path: '/$postId/',
-    getParentRoute: () => PostsAuthenticatedRoute,
+const PostsAuthenticatedPostIdRoute = PostsAuthenticatedPostIdImport.update({
+  path: '/$postId',
+  getParentRoute: () => PostsAuthenticatedRoute,
+} as any)
+
+const PostsAuthenticatedPostIdLayoutRoute =
+  PostsAuthenticatedPostIdLayoutImport.update({
+    id: '/_layout',
+    getParentRoute: () => PostsAuthenticatedPostIdRoute,
   } as any)
 
-const PostsAuthenticatedPostIdCommentsCommentIdRoute =
-  PostsAuthenticatedPostIdCommentsCommentIdImport.update({
-    path: '/$postId/comments/$commentId',
-    getParentRoute: () => PostsAuthenticatedRoute,
+const PostsAuthenticatedPostIdLayoutIndexRoute =
+  PostsAuthenticatedPostIdLayoutIndexImport.update({
+    path: '/',
+    getParentRoute: () => PostsAuthenticatedPostIdLayoutRoute,
+  } as any)
+
+const PostsAuthenticatedPostIdLayoutCommentsCommentIdRoute =
+  PostsAuthenticatedPostIdLayoutCommentsCommentIdImport.update({
+    path: '/comments/$commentId',
+    getParentRoute: () => PostsAuthenticatedPostIdLayoutRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -87,13 +102,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsIndexImport
       parentRoute: typeof PostsImport
     }
-    '/posts/_authenticated/$postId/': {
-      preLoaderRoute: typeof PostsAuthenticatedPostIdIndexImport
+    '/posts/_authenticated/$postId': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdImport
       parentRoute: typeof PostsAuthenticatedImport
     }
-    '/posts/_authenticated/$postId/comments/$commentId': {
-      preLoaderRoute: typeof PostsAuthenticatedPostIdCommentsCommentIdImport
-      parentRoute: typeof PostsAuthenticatedImport
+    '/posts/_authenticated/$postId/_layout': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutImport
+      parentRoute: typeof PostsAuthenticatedPostIdRoute
+    }
+    '/posts/_authenticated/$postId/_layout/': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutIndexImport
+      parentRoute: typeof PostsAuthenticatedPostIdLayoutImport
+    }
+    '/posts/_authenticated/$postId/_layout/comments/$commentId': {
+      preLoaderRoute: typeof PostsAuthenticatedPostIdLayoutCommentsCommentIdImport
+      parentRoute: typeof PostsAuthenticatedPostIdLayoutImport
     }
   }
 }
@@ -105,8 +128,12 @@ export const routeTree = rootRoute.addChildren([
   AboutLazyRoute,
   PostsRoute.addChildren([
     PostsAuthenticatedRoute.addChildren([
-      PostsAuthenticatedPostIdIndexRoute,
-      PostsAuthenticatedPostIdCommentsCommentIdRoute,
+      PostsAuthenticatedPostIdRoute.addChildren([
+        PostsAuthenticatedPostIdLayoutRoute.addChildren([
+          PostsAuthenticatedPostIdLayoutIndexRoute,
+          PostsAuthenticatedPostIdLayoutCommentsCommentIdRoute,
+        ]),
+      ]),
     ]),
     PostsIndexRoute,
   ]),
